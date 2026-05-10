@@ -225,6 +225,19 @@ export default function Sidebar({ currentView, onViewChange, streak, completedTo
           <LogOut size={16} />
           {!collapsed && <span>Sign out</span>}
         </button>
+
+        {/* Connection Status Badge */}
+        {!collapsed && (
+          <div style={{ 
+            marginTop: 8, padding: '4px 8px', borderRadius: 6, fontSize: 10, fontWeight: 700, 
+            textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'center',
+            background: isSupabaseConfigured ? 'rgba(16, 185, 129, 0.1)' : 'rgba(244, 63, 94, 0.1)',
+            color: isSupabaseConfigured ? '#10b981' : '#fb7185',
+            border: `1px solid ${isSupabaseConfigured ? 'rgba(16, 185, 129, 0.2)' : 'rgba(244, 63, 94, 0.2)'}`
+          }}>
+            {isSupabaseConfigured ? '● Cloud Connected' : '○ Local Mode'}
+          </div>
+        )}
       </div>
     </aside>
     </>

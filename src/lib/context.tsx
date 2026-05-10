@@ -313,11 +313,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   // Sync with Supabase Auth
   useEffect(() => {
+    console.log('Career OS: Initializing AppProvider...', { isSupabaseConfigured });
+    
     if (!isSupabaseConfigured || !supabase) {
+      console.warn('Career OS: Supabase not configured. Running in Local Mode.');
       dispatch({ type: 'SET_STATE', payload: loadState() });
       setInitialized(true);
       return;
     }
+
+    console.log('Career OS: Supabase configured. Fetching session...');
+
 
     // Initial session check
     supabase.auth.getSession().then(({ data: { session } }) => {
