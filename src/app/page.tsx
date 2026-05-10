@@ -18,8 +18,9 @@ import AuthView from '@/components/AuthView';
 type View = 'dashboard' | 'learning' | 'ideation' | 'events' | 'projects' | 'internships' | 'logs';
 
 export default function Home() {
-  const { state } = useApp();
-  const [currentView, setCurrentView] = useState<View>('dashboard');
+  const { state, dispatch } = useApp();
+  const currentView = state.currentView;
+  const setCurrentView = (v: View) => dispatch({ type: 'SET_VIEW', payload: v as any });
   const [session, setSession] = useState<any>(null);
   const [loading, setLoading] = useState(isSupabaseConfigured);
 

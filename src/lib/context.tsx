@@ -5,7 +5,7 @@ import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import {
   AppState, Topic, Module, Project, Resource, HackathonEvent,
   InternshipApp, DailyLog, TodoItem, IdeaProject, IdeaResource, StatusTag, AppStatus, EventStatus,
-  loadState, saveState, genId, DEFAULT_STATE
+  loadState, saveState, genId, DEFAULT_STATE, ViewType
 } from './store';
 
 // ─── Action Types ─────────────────────────────────────────────────────────────
@@ -52,6 +52,7 @@ type Action =
   | { type: 'ADD_IDEA_RESOURCE'; payload: { ideaId: string; data: Omit<IdeaResource, 'id'> } }
   | { type: 'UPDATE_IDEA_RESOURCE'; payload: { ideaId: string; resourceId: string; data: Partial<IdeaResource> } }
   | { type: 'DELETE_IDEA_RESOURCE'; payload: { ideaId: string; resourceId: string } }
+  | { type: 'SET_VIEW'; payload: ViewType }
   | { type: 'RESET_STATE' };
 
 // ─── Reducer ──────────────────────────────────────────────────────────────────
@@ -60,6 +61,8 @@ function reducer(state: AppState, action: Action): AppState {
   switch (action.type) {
     case 'SET_STATE':
       return action.payload;
+    case 'SET_VIEW':
+      return { ...state, currentView: action.payload };
     case 'UPDATE_PROFILE': {
       const next = { ...state, profile: action.payload };
       if (typeof window !== 'undefined') {

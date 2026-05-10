@@ -135,8 +135,11 @@ export interface IdeaProject {
   createdAt: string;
 }
 
+export type ViewType = 'dashboard' | 'learning' | 'ideation' | 'events' | 'projects' | 'internships' | 'logs';
+
 export interface AppState {
   profile?: UserProfile;
+  currentView: ViewType;
   topics: Topic[];
   events: HackathonEvent[];
   internships: InternshipApp[];
@@ -149,6 +152,7 @@ export interface AppState {
 
 export const DEFAULT_STATE: AppState = {
   // profile is intentionally undefined — login required
+  currentView: 'dashboard',
   topics: [
     {
       id: 'topic-cv',

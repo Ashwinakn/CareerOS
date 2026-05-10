@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Camera, Mail, Lock, User, Target, BookOpen, Clock, Sunrise } from 'lucide-react';
+import { Camera, Mail, Lock, User, Target, BookOpen, Clock, Sunrise, Eye, EyeOff } from 'lucide-react';
 import { useApp } from '@/lib/context';
 
 type ProfilePayload = {
@@ -51,6 +51,7 @@ export default function AuthView({ onComplete }: { onComplete?: () => void }) {
   const [studyHoursPerDay, setStudyHoursPerDay] = useState('3–4 hours');
   const [preferredTime, setPreferredTime] = useState('Evening');
   const [mode, setMode] = useState<'login' | 'signup'>('signup');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const { dispatch } = useApp();
 
@@ -151,7 +152,24 @@ export default function AuthView({ onComplete }: { onComplete?: () => void }) {
             </Field>
 
             <Field icon={Lock}>
-              <input type="password" required placeholder="Password (min. 6 chars)" minLength={6} value={password} onChange={e => setPassword(e.target.value)} style={inputStyle} />
+              <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                <input 
+                  type={showPassword ? "text" : "password"} 
+                  required 
+                  placeholder="Password (min. 6 chars)" 
+                  minLength={6} 
+                  value={password} 
+                  onChange={e => setPassword(e.target.value)} 
+                  style={inputStyle} 
+                />
+                <button 
+                  type="button" 
+                  onClick={() => setShowPassword(!showPassword)} 
+                  style={{ background: 'none', border: 'none', padding: '0 8px', cursor: 'pointer', color: 'var(--text-dim)' }}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </Field>
 
             {error && (
