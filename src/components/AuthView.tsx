@@ -18,6 +18,16 @@ const FOCUS_OPTIONS = ['Computer Vision', 'Web Development', 'Machine Learning',
 const HOURS_OPTIONS = ['1 hour', '2 hours', '3–4 hours', '4–6 hours', '6+ hours'];
 const TIME_OPTIONS = ['Morning', 'Afternoon', 'Evening', 'Late Night'];
 
+const Field = ({ icon: Icon, children }: { icon: any; children: React.ReactNode }) => (
+  <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--bg-root)', border: '1px solid var(--border-active)', padding: '0 14px', borderRadius: 10 }}>
+    <Icon size={18} color="var(--text-muted)" />
+    {children}
+  </div>
+);
+
+const inputStyle: React.CSSProperties = { width: '100%', padding: '14px 0', background: 'transparent', border: 'none', color: 'var(--text-primary)', outline: 'none', fontSize: 15, fontFamily: 'inherit' };
+const selectStyle: React.CSSProperties = { ...inputStyle, WebkitAppearance: 'none' };
+
 export default function AuthView({ onComplete }: { onComplete?: () => void }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -58,15 +68,7 @@ export default function AuthView({ onComplete }: { onComplete?: () => void }) {
     }
   };
 
-  const Field = ({ icon: Icon, children }: { icon: any; children: React.ReactNode }) => (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--bg-root)', border: '1px solid var(--border-active)', padding: '0 14px', borderRadius: 10 }}>
-      <Icon size={18} color="var(--text-muted)" />
-      {children}
-    </div>
-  );
 
-  const inputStyle: React.CSSProperties = { width: '100%', padding: '14px 0', background: 'transparent', border: 'none', color: 'var(--text-primary)', outline: 'none', fontSize: 15, fontFamily: 'inherit' };
-  const selectStyle: React.CSSProperties = { ...inputStyle, WebkitAppearance: 'none' };
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>

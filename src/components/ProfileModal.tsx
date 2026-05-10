@@ -8,6 +8,19 @@ const FOCUS_OPTIONS = ['Computer Vision', 'Web Development', 'Machine Learning',
 const HOURS_OPTIONS = ['1 hour', '2 hours', '3–4 hours', '4–6 hours', '6+ hours'];
 const TIME_OPTIONS = ['Morning', 'Afternoon', 'Evening', 'Late Night'];
 
+const inputStyle: React.CSSProperties = { width: '100%', padding: '12px 0', background: 'transparent', border: 'none', color: 'var(--text-primary)', outline: 'none', fontSize: 14, fontFamily: 'inherit' };
+const selectStyle: React.CSSProperties = { ...inputStyle, WebkitAppearance: 'none' };
+
+const Field = ({ icon: Icon, label, children }: { icon: any; label: string; children: React.ReactNode }) => (
+  <div>
+    <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-dim)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</div>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--bg-root)', border: '1px solid var(--border-active)', padding: '0 12px', borderRadius: 8 }}>
+      <Icon size={16} color="var(--text-muted)" />
+      {children}
+    </div>
+  </div>
+);
+
 export default function ProfileModal({ onClose }: { onClose: () => void }) {
   const { state, dispatch } = useApp();
   const p = state.profile!;
@@ -50,18 +63,7 @@ export default function ProfileModal({ onClose }: { onClose: () => void }) {
     setTimeout(() => { setSaved(false); onClose(); }, 800);
   };
 
-  const inputStyle: React.CSSProperties = { width: '100%', padding: '12px 0', background: 'transparent', border: 'none', color: 'var(--text-primary)', outline: 'none', fontSize: 14, fontFamily: 'inherit' };
-  const selectStyle: React.CSSProperties = { ...inputStyle, WebkitAppearance: 'none' };
 
-  const Field = ({ icon: Icon, label, children }: { icon: any; label: string; children: React.ReactNode }) => (
-    <div>
-      <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-dim)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--bg-root)', border: '1px solid var(--border-active)', padding: '0 12px', borderRadius: 8 }}>
-        <Icon size={16} color="var(--text-muted)" />
-        {children}
-      </div>
-    </div>
-  );
 
   return (
     <div className="modal-overlay" onClick={onClose}>
