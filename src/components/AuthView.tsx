@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Camera, Mail, Lock, User, Target, BookOpen, Clock, Sunrise, Eye, EyeOff } from 'lucide-react';
 import { useApp } from '@/lib/context';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 
 type ProfilePayload = {
   email: string;
@@ -59,29 +60,59 @@ export default function AuthView({ onComplete }: { onComplete?: () => void }) {
     e.preventDefault();
     setError('');
 
-    const usersStr = localStorage.getItem('career_os_users') || '[]';
-    const users: ProfilePayload[] = JSON.parse(usersStr);
+    if (!isSupabaseConfigured) {
+      // Fallback for local development without Supabase
+      const usersStr = localStorage.getItem('career_os_users') || '[]';
+      const users: any[] = JSON.parse(usersStr);
 
-    if (mode === 'signup') {
-      if (users.find(u => u.email === email)) {
-        setError('An account with this email already exists. Please sign in instead.');
-        return;
+      if (mode === 'signup') {
+        if (users.find(u => u.email === email)) {
+          setError('An account with this email already exists. Please sign in instead.');
+          return;
+        }
+        const finalFocusArea = focusArea === 'Others' ? otherFocusArea : focusArea;
+        const profile: ProfilePayload = { email, name: name || 'Engineer', focusArea: finalFocusArea, preferences: [], learningGoal, studyHoursPerDay, preferredTime };
+        users.push({ ...profile, ...{ password } as any });
+        localStorage.setItem('career_os_users', JSON.stringify(users));
+        dispatch({ type: 'UPDATE_PROFILE', payload: profile });
+        if (onComplete) onComplete();
+      } else {
+        const user = users.find((u: any) => u.email === email && u.password === password);
+        if (!user) {
+          setError('Invalid email or password.');
+          return;
+        }
+        dispatch({ type: 'UPDATE_PROFILE', payload: { email: user.email, name: user.name, focusArea: user.focusArea, preferences: user.preferences || [], learningGoal: user.learningGoal || '', studyHoursPerDay: user.studyHoursPerDay || '3–4 hours', preferredTime: user.preferredTime || 'Evening' } });
+        if (onComplete) onComplete();
       }
-      const finalFocusArea = focusArea === 'Others' ? otherFocusArea : focusArea;
-      const profile: ProfilePayload = { email, name: name || 'Engineer', focusArea: finalFocusArea, preferences: [], learningGoal, studyHoursPerDay, preferredTime };
-      users.push({ ...profile, ...{ password } as any });
-      localStorage.setItem('career_os_users', JSON.stringify(users));
-      dispatch({ type: 'UPDATE_PROFILE', payload: profile });
-      if (onComplete) onComplete();
-    } else {
-      const user = users.find((u: any) => u.email === email && u.password === password);
-      if (!user) {
-        setError('Invalid email or password.');
-        return;
-      }
-      dispatch({ type: 'UPDATE_PROFILE', payload: { email: user.email, name: user.name, focusArea: user.focusArea, preferences: user.preferences || [], learningGoal: user.learningGoal || '', studyHoursPerDay: user.studyHoursPerDay || '3–4 hours', preferredTime: user.preferredTime || 'Evening' } });
-      if (onComplete) onComplete();
+      return;
     }
+
+    // Actual Supabase Auth
+    const runAuth = async () => {
+      try {
+        if (mode === 'signup') {
+          const { data, error } = await supabase!.auth.signUp({ email, password });
+          if (error) throw error;
+          
+          const finalFocusArea = focusArea === 'Others' ? otherFocusArea : focusArea;
+          const profile: ProfilePayload = { email, name: name || 'Engineer', focusArea: finalFocusArea, preferences: [], learningGoal, studyHoursPerDay, preferredTime };
+          
+          // The state sync in context.tsx will handle the initial upsert once the session is set
+          dispatch({ type: 'UPDATE_PROFILE', payload: profile });
+          if (onComplete) onComplete();
+        } else {
+          const { data, error } = await supabase!.auth.signInWithPassword({ email, password });
+          if (error) throw error;
+          // Profile will be loaded from Supabase by the context provider
+          if (onComplete) onComplete();
+        }
+      } catch (err: any) {
+        setError(err.message || 'Authentication failed');
+      }
+    };
+
+    runAuth();
   };
 
 

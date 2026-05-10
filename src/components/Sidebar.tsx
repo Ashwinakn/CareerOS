@@ -7,6 +7,7 @@ import {
   Camera, LayoutDashboard, Calendar, Briefcase, ClipboardList, ChevronRight,
   Flame, BookOpen, PanelLeftClose, PanelLeft, Moon, Sun, Settings, LogOut, Search, User, Pencil, Lightbulb
 } from 'lucide-react';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import ProfileModal from '@/components/ProfileModal';
 
 type View = 'dashboard' | 'learning' | 'ideation' | 'events' | 'projects' | 'internships' | 'logs';
@@ -40,9 +41,12 @@ export default function Sidebar({ currentView, onViewChange, streak, completedTo
     return () => window.removeEventListener('career-os-toggle-sidebar', handleToggle);
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     // Reset state to log out
     if (confirm("Are you sure you want to sign out?")) {
+      if (isSupabaseConfigured && supabase) {
+        await supabase.auth.signOut();
+      }
       dispatch({ type: 'RESET_STATE' });
       window.location.reload();
     }
