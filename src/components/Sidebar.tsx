@@ -29,10 +29,16 @@ const NAV_ITEMS: { id: View; label: string; icon: React.ComponentType<{ size?: n
 ];
 
 export default function Sidebar({ currentView, onViewChange, streak, completedToday }: SidebarProps) {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(typeof window !== 'undefined' ? window.innerWidth < 1024 : false);
   const [showProfile, setShowProfile] = useState(false);
   const { theme, setTheme } = useTheme();
   const { state, dispatch } = useApp();
+
+  React.useEffect(() => {
+    const handleToggle = () => setCollapsed(prev => !prev);
+    window.addEventListener('career-os-toggle-sidebar', handleToggle);
+    return () => window.removeEventListener('career-os-toggle-sidebar', handleToggle);
+  }, []);
 
   const handleLogout = () => {
     // Reset state to log out
@@ -44,6 +50,15 @@ export default function Sidebar({ currentView, onViewChange, streak, completedTo
 
   return (
     <>
+      {/* Mobile Overlay */}
+      {!collapsed && (
+        <div 
+          className="mobile-only" 
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 90, backdropFilter: 'blur(2px)' }} 
+          onClick={() => setCollapsed(true)} 
+        />
+      )}
+
       {showProfile && <ProfileModal onClose={() => setShowProfile(false)} />}
       <aside
       style={{
@@ -55,12 +70,25 @@ export default function Sidebar({ currentView, onViewChange, streak, completedTo
         display: 'flex',
         flexDirection: 'column',
         padding: collapsed ? '24px 8px' : '24px 12px',
-        position: 'sticky',
+        position: 'fixed',
+        left: 0,
         top: 0,
+        bottom: 0,
+        zIndex: 100,
+        transform: collapsed ? 'translateX(-100%)' : 'translateX(0)',
         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-        zIndex: 40,
+        boxShadow: collapsed ? 'none' : '20px 0 50px rgba(0,0,0,0.1)',
       }}
+      className="mobile-sidebar"
     >
+      {/* Mobile Toggle inside sidebar (only visible when expanded on mobile) */}
+      <button 
+        className="mobile-only btn-ghost" 
+        style={{ position: 'absolute', right: -40, top: 20, background: 'var(--bg-sidebar)', border: '1px solid var(--border-subtle)', borderRadius: '0 8px 8px 0', padding: 8 }}
+        onClick={() => setCollapsed(true)}
+      >
+        <PanelLeftClose size={20} />
+      </button>
       {/* Header Profile Area */}
       <div
         style={{ display: 'flex', alignItems: 'center', justifyContent: collapsed ? 'center' : 'space-between', marginBottom: 24, padding: collapsed ? 0 : '0 8px', cursor: 'pointer' }}

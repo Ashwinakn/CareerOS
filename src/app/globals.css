@@ -206,3 +206,24 @@ body {
 .weekend-glow {
   animation: pulseGlow 2s infinite;
 }
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .desktop-only { display: none !important; }
+  .mobile-only { display: block !important; }
+  .mobile-flex { display: flex !important; }
+  .mobile-hide { display: none !important; }
+  
+  .card { padding: 16px !important; }
+  .modal-content { width: 95%; padding: 20px; }
+  
+  /* Stack grids on mobile */
+  .grid-2, .grid-3, .grid-4 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-only { display: none !important; }
+}
+

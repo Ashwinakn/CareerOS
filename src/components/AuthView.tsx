@@ -14,7 +14,20 @@ type ProfilePayload = {
   preferredTime: string;
 };
 
-const FOCUS_OPTIONS = ['Computer Vision', 'Web Development', 'Machine Learning', 'Data Science', 'UI/UX Design', 'Robotics', 'NLP'];
+const FOCUS_OPTIONS = [
+  'Computer Vision', 'Natural Language Processing', 'Deep Learning', 'Machine Learning', 'Data Science', 
+  'Full Stack Web Development', 'Frontend Engineering', 'Backend Engineering', 'DevOps & Cloud Infrastructure', 
+  'Cybersecurity', 'Mobile App Development', 'Embedded Systems & IoT', 'Robotics & Autonomous Systems', 
+  'Game Development', 'AR/VR/XR Development', 'Blockchain & Web3', 'Database Administration', 
+  'Network Engineering', 'UI/UX Design', 'Product Management', 'Quality Assurance & Testing', 
+  'Bioinformatics', 'Quantum Computing', 'Edge Computing', 'Cloud Architecture', 'Microservices Architecture', 
+  'Site Reliability Engineering', 'Big Data Engineering', 'Distributed Systems', 'High Performance Computing', 
+  'Human-Computer Interaction', 'Graphics Programming', 'Compiler Design', 'Operating Systems', 
+  'Digital Signal Processing', 'Parallel Programming', 'Financial Technology (FinTech)', 'Health Informatics', 
+  'E-commerce Systems', 'Information Retrieval', 'Semantic Web', 'Computer Security & Cryptography', 
+  'Cloud Native Development', 'Serverless Architecture', 'APIs & Integration', 'Technical Writing', 
+  'Scientific Computing', 'VLSI Design', 'Computational Geometry', 'Software Architecture', 'Others'
+];
 const HOURS_OPTIONS = ['1 hour', '2 hours', '3–4 hours', '4–6 hours', '6+ hours'];
 const TIME_OPTIONS = ['Morning', 'Afternoon', 'Evening', 'Late Night'];
 
@@ -33,6 +46,7 @@ export default function AuthView({ onComplete }: { onComplete?: () => void }) {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [focusArea, setFocusArea] = useState('Computer Vision');
+  const [otherFocusArea, setOtherFocusArea] = useState('');
   const [learningGoal, setLearningGoal] = useState('');
   const [studyHoursPerDay, setStudyHoursPerDay] = useState('3–4 hours');
   const [preferredTime, setPreferredTime] = useState('Evening');
@@ -52,7 +66,8 @@ export default function AuthView({ onComplete }: { onComplete?: () => void }) {
         setError('An account with this email already exists. Please sign in instead.');
         return;
       }
-      const profile: ProfilePayload = { email, name: name || 'Engineer', focusArea, preferences: [], learningGoal, studyHoursPerDay, preferredTime };
+      const finalFocusArea = focusArea === 'Others' ? otherFocusArea : focusArea;
+      const profile: ProfilePayload = { email, name: name || 'Engineer', focusArea: finalFocusArea, preferences: [], learningGoal, studyHoursPerDay, preferredTime };
       users.push({ ...profile, ...{ password } as any });
       localStorage.setItem('career_os_users', JSON.stringify(users));
       dispatch({ type: 'UPDATE_PROFILE', payload: profile });
@@ -102,6 +117,13 @@ export default function AuthView({ onComplete }: { onComplete?: () => void }) {
                     {FOCUS_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
                   </select>
                 </Field>
+
+                {focusArea === 'Others' && (
+                  <Field icon={Target}>
+                    <input type="text" required placeholder="Type your focus area..." value={otherFocusArea} onChange={e => setOtherFocusArea(e.target.value)} style={inputStyle} />
+                  </Field>
+                )}
+
 
                 <Field icon={BookOpen}>
                   <input type="text" placeholder="Learning Goal  (e.g. Land a CV intern by Dec)" value={learningGoal} onChange={e => setLearningGoal(e.target.value)} style={inputStyle} />

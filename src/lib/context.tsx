@@ -316,12 +316,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
+    // Initial session check
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUserId(session?.user.id || null);
+      // If no session, set initialized to true so it can show AuthView
+      if (!session) {
+        setInitialized(true);
+      }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUserId(session?.user.id || null);
+      if (!session) {
+        setInitialized(true);
+      }
     });
 
     return () => subscription.unsubscribe();

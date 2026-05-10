@@ -4,7 +4,20 @@ import React, { useState } from 'react';
 import { useApp } from '@/lib/context';
 import { User, Target, BookOpen, Clock, Sunrise, X, Check } from 'lucide-react';
 
-const FOCUS_OPTIONS = ['Computer Vision', 'Web Development', 'Machine Learning', 'Data Science', 'UI/UX Design', 'Robotics', 'NLP'];
+const FOCUS_OPTIONS = [
+  'Computer Vision', 'Natural Language Processing', 'Deep Learning', 'Machine Learning', 'Data Science', 
+  'Full Stack Web Development', 'Frontend Engineering', 'Backend Engineering', 'DevOps & Cloud Infrastructure', 
+  'Cybersecurity', 'Mobile App Development', 'Embedded Systems & IoT', 'Robotics & Autonomous Systems', 
+  'Game Development', 'AR/VR/XR Development', 'Blockchain & Web3', 'Database Administration', 
+  'Network Engineering', 'UI/UX Design', 'Product Management', 'Quality Assurance & Testing', 
+  'Bioinformatics', 'Quantum Computing', 'Edge Computing', 'Cloud Architecture', 'Microservices Architecture', 
+  'Site Reliability Engineering', 'Big Data Engineering', 'Distributed Systems', 'High Performance Computing', 
+  'Human-Computer Interaction', 'Graphics Programming', 'Compiler Design', 'Operating Systems', 
+  'Digital Signal Processing', 'Parallel Programming', 'Financial Technology (FinTech)', 'Health Informatics', 
+  'E-commerce Systems', 'Information Retrieval', 'Semantic Web', 'Computer Security & Cryptography', 
+  'Cloud Native Development', 'Serverless Architecture', 'APIs & Integration', 'Technical Writing', 
+  'Scientific Computing', 'VLSI Design', 'Computational Geometry', 'Software Architecture', 'Others'
+];
 const HOURS_OPTIONS = ['1 hour', '2 hours', '3–4 hours', '4–6 hours', '6+ hours'];
 const TIME_OPTIONS = ['Morning', 'Afternoon', 'Evening', 'Late Night'];
 
@@ -26,7 +39,9 @@ export default function ProfileModal({ onClose }: { onClose: () => void }) {
   const p = state.profile!;
 
   const [name, setName] = useState(p.name);
-  const [focusArea, setFocusArea] = useState(p.focusArea);
+  const isCustomFocus = !FOCUS_OPTIONS.includes(p.focusArea);
+  const [focusArea, setFocusArea] = useState(isCustomFocus ? 'Others' : p.focusArea);
+  const [otherFocusArea, setOtherFocusArea] = useState(isCustomFocus ? p.focusArea : '');
   const [learningGoal, setLearningGoal] = useState(p.learningGoal || '');
   const [studyHoursPerDay, setStudyHoursPerDay] = useState(p.studyHoursPerDay || '3–4 hours');
   const [preferredTime, setPreferredTime] = useState(p.preferredTime || 'Evening');
@@ -44,9 +59,10 @@ export default function ProfileModal({ onClose }: { onClose: () => void }) {
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
+    const finalFocusArea = focusArea === 'Others' ? otherFocusArea : focusArea;
     dispatch({
       type: 'UPDATE_PROFILE',
-      payload: { email: p.email, name, focusArea, preferences, learningGoal, studyHoursPerDay, preferredTime },
+      payload: { email: p.email, name, focusArea: finalFocusArea, preferences, learningGoal, studyHoursPerDay, preferredTime },
     });
 
     // Also update the user registry so next login restores the name
@@ -54,7 +70,7 @@ export default function ProfileModal({ onClose }: { onClose: () => void }) {
       const users: any[] = JSON.parse(localStorage.getItem('career_os_users') || '[]');
       const idx = users.findIndex(u => u.email === p.email);
       if (idx !== -1) {
-        users[idx] = { ...users[idx], name, focusArea, preferences, learningGoal, studyHoursPerDay, preferredTime };
+        users[idx] = { ...users[idx], name, focusArea: finalFocusArea, preferences, learningGoal, studyHoursPerDay, preferredTime };
         localStorage.setItem('career_os_users', JSON.stringify(users));
       }
     } catch {}
@@ -86,6 +102,13 @@ export default function ProfileModal({ onClose }: { onClose: () => void }) {
               {FOCUS_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
             </select>
           </Field>
+
+          {focusArea === 'Others' && (
+            <Field icon={Target} label="Custom Focus Area">
+              <input type="text" required placeholder="Type your focus area..." value={otherFocusArea} onChange={e => setOtherFocusArea(e.target.value)} style={inputStyle} />
+            </Field>
+          )}
+
 
           <div>
             <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-dim)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Preferences (Max 3)</div>
