@@ -345,10 +345,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (userId) {
       supabase.from('user_data').select('state').eq('user_id', userId).single()
         .then(({ data, error }) => {
-          if (data && data.state && Object.keys(data.state).length > 0) {
+          if (data && data.state && Object.keys(data.state).length > 2) { // Check for more than just empty {}
             dispatch({ type: 'SET_STATE', payload: data.state as AppState });
           } else {
-            dispatch({ type: 'SET_STATE', payload: DEFAULT_STATE });
+            // If we have no cloud state yet, keep the current state (which might have a profile from signup)
+            console.log('No existing cloud state found for this user.');
           }
           setInitialized(true);
         });
@@ -366,7 +367,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       // Sync to cloud
       supabase.from('user_data').upsert({ user_id: userId, state, updated_at: new Date().toISOString() })
         .then(({ error }) => {
-          if (error) console.error('Failed to sync state to Supabase', error);
+          if (error) {
+            console.error('CRITICAL: Failed to sync state to Supabase', error);
+            // Optionally alert the user if it's a persistent error
+            if (error.code === '42501') {
+              console.error('Permission denied. Please check your Supabase RLS policies.');
+            }
+          } else {
+            console.log('Successfully synced state to Supabase');
+          }
         });
     } else if (!isSupabaseConfigured) {
       // Sync to localStorage
